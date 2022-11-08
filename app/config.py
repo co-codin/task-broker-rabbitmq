@@ -10,5 +10,10 @@ class Settings(BaseSettings):
     query_compile = 'compile_tasks'
     query_compile_result = 'compile_results'
 
+    exchange_execute = 'query_execute'
+    query_execute_result = 'execute_results'
+
+    api_query_executor = 'http://query_executor:8000/v1'
+
 
 settings = Settings()
