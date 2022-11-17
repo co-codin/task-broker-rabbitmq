@@ -55,9 +55,7 @@ async def update_compile_status():
             logger.error(parse_err)
         except QueryExecutorTimeoutError as query_executor_api_err:
             logger.error(query_executor_api_err)
-    asyncio.current_task(asyncio.get_running_loop()).add_done_callback(
-        lambda task: asyncio.create_task(update_compile_status())
-    )
+    asyncio.create_task(update_compile_status())
 
 
 async def update_execute_status():
@@ -71,9 +69,7 @@ async def update_execute_status():
         except (DeserializeJSONQueryError, DictKeyError) as parse_err:
             await channel.basic_reject(delivery_tag)
             logger.error(parse_err)
-    asyncio.current_task(asyncio.get_running_loop()).add_done_callback(
-        lambda task: asyncio.create_task(update_execute_status())
-    )
+    asyncio.create_task(update_execute_status())
 
 
 async def post_query_to_executor(guid: str, query: str):
