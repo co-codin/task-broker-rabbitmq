@@ -15,5 +15,11 @@ class Settings(BaseSettings):
 
     api_query_executor = 'http://query_executor:8000/v1'
 
+    """RabbitMQ constants"""
+    heartbeat: int = 5
+    connection_attempts: int = 5
+    retry_delay: int = 10
+    timeout: int = 15
+
 
 settings = Settings()

@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import Column, DateTime, BigInteger, String, Text
 from sqlalchemy.sql import func
 
-from app.database import Base
+from app.db.session import Base
 
 
 __all__ = (
@@ -23,7 +23,6 @@ class QUERY_STATUS(Enum):
     DONE = 'done'
     ERROR_ACCESS_DENIED = 'no_access'
     ERROR_EXECUTION_ERROR = 'sql_error'
-
 
 
 class Query(Base):

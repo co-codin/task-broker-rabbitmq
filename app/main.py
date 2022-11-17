@@ -1,19 +1,27 @@
 import json
-
+import logging
 import httpx
 import asyncio
-from fastapi import FastAPI
-from sqlalchemy import update
+
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 from app.routers import queries
 from app.mq import create_channel
-from app.database import db_session
-from app.models import Query, QUERY_STATUS
+from app.crud.crud_query import (
+    update_compile_query_status, update_execute_query_status
+)
+from app.utils.parse_utils import parse_mq_query
 from app.config import settings
-
+from app.errors import (
+    APIError, NoDBConnection, DBError, DeserializeJSONQueryError, DictKeyError,
+    QueryExecutorTimeoutError
+)
 
 app = FastAPI()
 app.include_router(queries.router, prefix='/query')
+
+logger = logging.getLogger(__name__)
 
 
 @app.on_event('startup')
@@ -35,43 +43,59 @@ async def declare_queues():
 
 async def update_compile_status():
     async with create_channel() as channel:
-        async for body in channel.consume(settings.query_compile_result):
-            payload = json.loads(body)
-            guid = payload['guid']
-            query = payload['query']
-
-            async with db_session() as session:
-                await session.execute(
-                    update(Query)
-                        .where(Query.guid == guid)
-                        .values(compiled_query=query, status=QUERY_STATUS.COMPILED.value)
-                )
-
-            async with httpx.AsyncClient() as requests:
-                r = await requests.post(f'{settings.api_query_executor}/queries/', content=json.dumps({
-                    'guid': guid,
-                    'query': query,
-                    'db': 'raw',
-                }))
+        try:
+            async for delivery_tag, body in channel.consume(settings.query_compile_result):
+                guid, query = parse_mq_query(body, key='query')
+                await update_compile_query_status(guid, query)
+                await post_query_to_executor(guid, query)
+        except (NoDBConnection, DBError) as db_err:
+            logger.error(db_err)
+        except (DeserializeJSONQueryError, DictKeyError) as parse_err:
+            await channel.basic_reject(delivery_tag)
+            logger.error(parse_err)
+        except QueryExecutorTimeoutError as query_executor_api_err:
+            logger.error(query_executor_api_err)
+    asyncio.current_task(asyncio.get_running_loop()).add_done_callback(
+        lambda task: asyncio.create_task(update_compile_status())
+    )
 
 
 async def update_execute_status():
     async with create_channel() as channel:
-        async for body in channel.consume(settings.query_execute_result):
-            payload = json.loads(body)
-            guid = payload['guid']
-            result = payload['status']
+        try:
+            async for delivery_tag, body in channel.consume(settings.query_execute_result):
+                guid, result = parse_mq_query(body, key='result')
+                await update_execute_query_status(guid, result)
+        except (NoDBConnection, DBError) as db_err:
+            logger.error(db_err)
+        except (DeserializeJSONQueryError, DictKeyError) as parse_err:
+            await channel.basic_reject(delivery_tag)
+            logger.error(parse_err)
+    asyncio.current_task(asyncio.get_running_loop()).add_done_callback(
+        lambda task: asyncio.create_task(update_execute_status())
+    )
 
-            async with db_session() as session:
-                status = QUERY_STATUS.DONE.value
-                if result != 'done':
-                    status = QUERY_STATUS.ERROR_EXECUTION_ERROR.value
 
-                await session.execute(
-                    update(Query)
-                        .where(Query.guid == guid)
-                        .values(status=status)
-                )
+async def post_query_to_executor(guid: str, query: str):
+    async with httpx.AsyncClient() as requests:
+        try:
+            r = await requests.post(
+                f'{settings.api_query_executor}/queries/',
+                content=json.dumps({
+                    'guid': guid,
+                    'query': query,
+                    'db': 'raw',
+                }))
+        except httpx.ConnectTimeout:
+            raise QueryExecutorTimeoutError(f'{settings.api_query_executor}/queries/')
+
+
+@app.exception_handler(APIError)
+def api_exception_handler(request_: Request, exc: APIError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"message": str(exc)},
+    )
 
 
 if __name__ == '__main__':
