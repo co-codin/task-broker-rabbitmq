@@ -5,7 +5,7 @@ RUN pip install --no-cache-dir -U pip
 COPY requirements.txt /tmp/
 RUN pip install -r /tmp/requirements.txt
 
-RUN RUN mkdir -p /task_broker
+RUN mkdir -p /task_broker
 
 WORKDIR /task_broker
 
