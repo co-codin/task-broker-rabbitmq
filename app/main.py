@@ -82,7 +82,7 @@ async def post_query_to_executor(guid: str, query: str):
                     'query': query,
                     'db': 'raw',
                 }))
-        except httpx.ConnectTimeout:
+        except (httpx.ConnectTimeout, httpx.ConnectError):
             raise QueryExecutorTimeoutError(f'{settings.api_query_executor}/queries/')
 
 
