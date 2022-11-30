@@ -11,6 +11,8 @@ def config_logger():
     logger.setLevel(logging.DEBUG if settings.debug else logging.INFO)
     os.makedirs(settings.log_dir, exist_ok=True)
 
+    logging.getLogger('pika').setLevel(logging.WARNING)
+
     stream_handler = logging.StreamHandler()
     logger.addHandler(stream_handler)
 
