@@ -27,6 +27,7 @@ async def get_task(guid: str, session:AsyncSession = Depends(db_session)):
     return {
         'guid': item.guid,
         'compiled_query': item.compiled_query,
+        'run_id': item.last_run_id,
         'status': item.status
     }
 
