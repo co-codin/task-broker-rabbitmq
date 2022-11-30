@@ -7,4 +7,5 @@ COPY requirements.dev.txt /tmp/
 RUN pip install -r /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.dev.txt
 
-CMD ["bash"]
+WORKDIR /app
+CMD ["python", "-m", "app"]

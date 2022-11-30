@@ -2,8 +2,11 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    debug: bool = True
-    db_connection_string: str = 'postgresql+asyncpg://postgres:dwh@db:5432'
+    debug: bool = False
+    log_dir: str = "/var/log/n3dwh/"
+    log_name: str = "task_broker.log"
+    db_connection_string: str = 'postgresql+asyncpg://postgres:dwh@db:5432/broker'
+    db_migration_connection_string: str = 'postgresql+psycopg2://postgres:dwh@db:5432/broker'
     mq_connection_string: str = 'amqp://dwh:dwh@rabbit:5672'
 
     exchange_compile = 'query_compile'
