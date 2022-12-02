@@ -39,5 +39,7 @@ spec:
         - containerPort: 8000
       imagePullSecrets:
         - name: repositorycred
-#      restartPolicy: OnFailure
+      hostnames:
+        - task-broker.lan        
+#      restartPolicy: Never
 
