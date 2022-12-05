@@ -38,14 +38,15 @@ async def send_query(create: CreateRequest, session:AsyncSession = Depends(db_se
     query = Query(
         query=query_json
     )
-    LOG.info(f'Creating send query request with guid {query.guid}')
     session.add(query)
     await session.commit()
+    LOG.info(f'Creating send query request with guid {query.guid}')
 
     await mq.basic_publish(settings.exchange_compile, 'task', json.dumps({
         'guid': query.guid,
         'query': query_json
     }))
+    LOG.info(f'Qreating send query request {query.guid} sent to compiler')
 
     return {
         'query_id': query.guid,
