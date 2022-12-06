@@ -46,7 +46,7 @@ async def send_query(create: CreateRequest, session:AsyncSession = Depends(db_se
         'guid': query.guid,
         'query': query_json
     }))
-    LOG.info(f'Qreating send query request {query.guid} sent to compiler')
+    LOG.info(f'Send query request {query.guid} sent to compiler')
 
     return {
         'query_id': query.guid,

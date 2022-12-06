@@ -22,7 +22,8 @@ class QUERY_STATUS(Enum):
     CANCELED = 'canceled'
     DONE = 'done'
     ERROR_ACCESS_DENIED = 'no_access'
-    ERROR_EXECUTION_ERROR = 'sql_error'
+    ERROR_COMPILATION_ERROR = 'sql_compile_error'
+    ERROR_EXECUTION_ERROR = 'sql_execution_error'
 
 
 
