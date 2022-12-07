@@ -10,12 +10,20 @@ from app.errors import NoTaskFound
 LOG = logging.getLogger(__name__)
 
 
-async def update_compile_query_status(guid: str, query: str):
+async def update_compile_query_status(guid: str, query: str, status: QUERY_STATUS):
     async with db_session() as session:
         await session.execute(
             update(Query)
             .where(Query.guid == guid)
-            .values(compiled_query=query, status=QUERY_STATUS.COMPILED.value)
+            .values(compiled_query=query, status=status)
+        )
+
+
+async def update_compile_query_last_run_id(guid: str, last_run_id: str):
+    async with db_session() as session:
+        await session.execute(
+            update(Query).where(Query.guid == guid).values(
+                last_run_id=last_run_id)
         )
 
 

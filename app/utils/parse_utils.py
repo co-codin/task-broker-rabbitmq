@@ -1,18 +1,11 @@
 import json
 
-from typing import Tuple, Union, Dict
+from typing import Union, Dict
 
 from app.errors import DeserializeJSONQueryError, DictKeyError
 
 
-def parse_mq_query(body: str, key: str) -> Tuple[str, Union[str, Dict]]:
-    payload = _deserialize_json_query(body)
-    guid = _get_value_from_payload(payload, 'guid')
-    result = _get_value_from_payload(payload, key)
-    return guid, result
-
-
-def _get_value_from_payload(payload: Dict, key: str) -> Union[str, Dict]:
+def get_payload_value(payload: Dict, key: str) -> Union[str, Dict]:
     try:
         value = payload[key]
     except KeyError as key_err:
@@ -21,7 +14,7 @@ def _get_value_from_payload(payload: Dict, key: str) -> Union[str, Dict]:
         return value
 
 
-def _deserialize_json_query(json_query: str) -> Dict:
+def deserialize_json_query(json_query: str) -> Dict:
     try:
         payload = json.loads(json_query)
     except json.JSONDecodeError as json_decode_err:

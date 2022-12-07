@@ -1,9 +1,13 @@
 FROM python:3.8-alpine
+ARG SERVICE_PORT=8000
+RUN pip install --no-cache-dir -U pip
 
 COPY requirements.txt /tmp/
 RUN pip install -r /tmp/requirements.txt
 
-WORKDIR /task_broker
-COPY app/ ./app/
+COPY app/ /app/app/
 
-CMD ["uvicorn", "app.main:app" , "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE $SERVICE_PORT
+
+WORKDIR /app
+CMD ["python3", "-m", "app"]

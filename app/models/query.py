@@ -31,6 +31,7 @@ class Query(Base):
     id = Column(BigInteger, primary_key=True)
     guid = Column(String(36), nullable=False, default=lambda: str(uuid4()), unique=True, index=True)
     query = Column(Text, nullable=False)
+    last_run_id = Column(BigInteger)
     compiled_query = Column(Text, nullable=True)
     status = Column(String(64), default=QUERY_STATUS.CREATED.value, nullable=False)
     error_description = Column(Text)
