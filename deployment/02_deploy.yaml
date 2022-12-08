@@ -39,7 +39,10 @@ spec:
         - containerPort: 8000
       imagePullSecrets:
         - name: repositorycred
-      hostnames:
-        - task-broker.lan        
+ 
+      hostAliases:
+        - ip: 127.0.0.1        
+          hostnames:
+          - task-broker.lan                
 #      restartPolicy: Never
 
