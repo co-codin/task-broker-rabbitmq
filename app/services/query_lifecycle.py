@@ -71,7 +71,8 @@ async def send_for_execution(guid: str):
                 'guid': query.guid,
                 'query': query.compiled_query,
                 'db': 'raw',
-                'result_destinations': ['table', 'file']
+                'result_destinations': ['table', 'file'],
+                'identity_id': query.identity_id,
             }))
             if r.status_code != 200:
                 raise Exception(f'Rask {query.guid} failed to sent to execution: {r.text}')

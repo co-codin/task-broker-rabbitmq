@@ -8,6 +8,7 @@ from app.mq import create_channel
 from app.config import settings
 from app.services.query_lifecycle import process_compile_update, process_execution_update
 from app.logger_config import config_logger
+from app.auth import load_jwks
 
 
 config_logger()
@@ -18,7 +19,9 @@ app.include_router(queries.router, prefix='/query')
 
 
 @app.on_event('startup')
-async def declare_queues():
+async def on_startup():
+    await load_jwks()
+
     async with create_channel() as channel:
         await channel.exchange_declare(settings.exchange_compile, 'direct')
         await channel.queue_declare(settings.query_compile)
