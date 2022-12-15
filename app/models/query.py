@@ -22,7 +22,8 @@ class QUERY_STATUS(Enum):
     CANCELED = 'canceled'
     DONE = 'done'
     ERROR_ACCESS_DENIED = 'no_access'
-    ERROR_EXECUTION_ERROR = 'sql_error'
+    ERROR_COMPILATION_ERROR = 'sql_compile_error'
+    ERROR_EXECUTION_ERROR = 'sql_execution_error'
 
 
 
@@ -32,6 +33,7 @@ class Query(Base):
     id = Column(BigInteger, primary_key=True)
     guid = Column(String(36), nullable=False, default=lambda: str(uuid4()), unique=True, index=True)
     query = Column(Text, nullable=False)
+    identity_id = Column(String(36))
     last_run_id = Column(BigInteger)
     compiled_query = Column(Text, nullable=True)
     status = Column(String(64), default=QUERY_STATUS.CREATED.value, nullable=False)
