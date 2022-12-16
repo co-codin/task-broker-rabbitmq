@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     query_execute_result = 'execute_results'
 
     api_query_executor = 'http://query-executor.lan:8000/v1'
+    api_iam = 'http://iam.lan:8000'
+
+    class Config:
+        env_prefix = "dwh_task_broker_"
+        case_sensitive = False
 
     """RabbitMQ constants"""
     heartbeat: int = 5

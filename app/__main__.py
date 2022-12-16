@@ -14,12 +14,17 @@ from app.crud.crud_query import (
 )
 from app.models import QUERY_STATUS
 from app.utils.parse_utils import get_payload_value, deserialize_json_query
+
+
 from app.config import settings
+from app.services.query_lifecycle import process_compile_update, process_execution_update
 from app.logger_config import config_logger
 from app.errors import (
     APIError, NoDBConnection, DBError, DeserializeJSONQueryError, DictKeyError,
     QueryExecutorTimeoutError
 )
+from app.auth import load_jwks
+
 
 config_logger()
 LOG = logging.getLogger(__name__)
@@ -29,7 +34,9 @@ app.include_router(queries.router, prefix='/query')
 
 
 @app.on_event('startup')
-async def declare_queues():
+async def on_startup():
+    await load_jwks()
+
     async with create_channel() as channel:
         await channel.exchange_declare(settings.exchange_compile, 'direct')
         await channel.queue_declare(settings.query_compile)
@@ -41,8 +48,8 @@ async def declare_queues():
         await channel.queue_declare(settings.query_execute_result)
         await channel.queue_bind(settings.query_execute_result, settings.exchange_execute, 'result')
 
-        asyncio.create_task(update_compile_status())
-        asyncio.create_task(update_execute_status())
+        asyncio.create_task(consume(settings.query_compile_result, process_compile_update))
+        asyncio.create_task(consume(settings.query_execute_result, process_execution_update))
 
 
 async def update_compile_status():
@@ -116,6 +123,22 @@ def api_exception_handler(request_: Request, exc: APIError) -> JSONResponse:
         status_code=exc.status_code,
         content={"message": str(exc)},
     )
+
+
+async def consume(query, func):
+    while True:
+        try:
+            LOG.info(f'Starting {query} worker')
+            async with create_channel() as channel:
+                async for body in channel.consume(query):
+                    try:
+                        await func(body)
+                    except Exception as e:
+                        LOG.exception(f'Failed to process message {body}: {e}')
+        except Exception as e:
+            LOG.exception(f'Worker {query} failed: {e}')
+
+        await asyncio.sleep(0.5)
 
 
 @app.get('/ping')
