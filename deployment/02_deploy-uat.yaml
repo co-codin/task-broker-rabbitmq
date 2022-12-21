@@ -22,21 +22,34 @@ spec:
         tier: frontend
         track: stable      
     spec:
+      volumes:
+      - name: volumelogs
+        hostPath:
+          path: /mnt/logs
+
       containers:
       - env:
         - name: LOG_DIR
-          value: /var/logs
-        - name: SERVICE_PORT
-          value: "8000"
-        - name: DB_CONNECTION_STRING
-          value: postgresql+asyncpg://postgres:dwh@10.50.4.110:5432/dwh          
-        - name: MQ_CONNECTION_STRING
-          value: amqp://dwh:dwh@10.50.4.110:5672/vhdev
+          value: /var/log/n3dwh/
+        - name: dwh_task_broker_db_connection_string
+          value: postgresql+asyncpg://postgres:dwh@postgres:5432/broker
+        - name: dwh_task_broker_db_migration_connection_string
+          value: postgresql+psycopg2://postgres:dwh@postgres:5432/broker
+        - name: dwh_task_broker_mq_connection_string
+          value: amqp://dwh:dwh@rabbitmq:5672
+        - name: dwh_task_broker_api_query_executor
+          value: http://query-executor:8000/v1
+        - name: dwh_task_broker_api_iam
+          value: http://iam:8000
+
         image: 10.50.4.110:5000/task-broker:dev
         imagePullPolicy: Always
         name: task-broker
         ports:
         - containerPort: 8000
+        volumeMounts:
+          - mountPath: /var/log/n3dwh/
+            name: volumelogs          
       imagePullSecrets:
         - name: repositorycred
  
@@ -44,5 +57,5 @@ spec:
         - ip: 127.0.0.1        
           hostnames:
           - task-broker.lan                
-#      restartPolicy: Never
+
 
