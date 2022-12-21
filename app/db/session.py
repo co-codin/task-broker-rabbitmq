@@ -28,7 +28,11 @@ async def db_session() -> AsyncSession:
             yield session
             await session.commit()
         except (gaierror, InterfaceError):
+            await session.rollback()
             raise NoDBConnection(settings.db_connection_string)
         except SQLAlchemyError:
             await session.rollback()
             raise DBError()
+        except:
+            await session.rollback()
+            raise
