@@ -1,16 +1,14 @@
 import json
 import logging
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from app.models import Query
 from app.config import settings
 from app.dependencies import db_session, mq_channel, get_user
-
+from app.crud.crud_query import select_task, create_query
 
 LOG = logging.getLogger(__name__)
 router = APIRouter()
@@ -22,9 +20,7 @@ class CreateRequest(BaseModel):
 
 @router.get('/{guid}')
 async def get_task(guid: str, session:AsyncSession = Depends(db_session), user: dict = Depends(get_user)):
-    item = await session.execute(select(Query).where(Query.guid == guid))
-    item = item.scalars().first()
-
+    item = await select_task(session, guid)
     if item.identity_id != user['identity_id']:
         raise HTTPException(status_code=404)
 
@@ -39,17 +35,11 @@ async def get_task(guid: str, session:AsyncSession = Depends(db_session), user: 
 
 @router.post('/')
 async def send_query(create: CreateRequest,
-                     session:AsyncSession = Depends(db_session),
-                     mq = Depends(mq_channel),
+                     session: AsyncSession = Depends(db_session),
+                     mq=Depends(mq_channel),
                      user: dict = Depends(get_user)):
     query_json = json.dumps(create.query)
-    query = Query(
-        query=query_json,
-        identity_id=user['identity_id']
-    )
-    session.add(query)
-    await session.commit()
-    LOG.info(f'Creating send query request with guid {query.guid} user {query.identity_id}')
+    query = await create_query(session, query_json, identity_id=user['identity_id'])
 
     await mq.basic_publish(settings.exchange_compile, 'task', json.dumps({
         'guid': query.guid,

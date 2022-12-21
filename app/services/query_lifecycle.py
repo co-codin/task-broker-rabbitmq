@@ -4,7 +4,7 @@ import logging
 import httpx
 from sqlalchemy import update, select
 
-from app.database import db_session
+from app.db.session import db_session
 from app.models import Query, QUERY_STATUS
 from app.config import settings
 
