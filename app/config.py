@@ -23,5 +23,11 @@ class Settings(BaseSettings):
         env_prefix = "dwh_task_broker_"
         case_sensitive = False
 
+    """RabbitMQ constants"""
+    heartbeat: int = 5
+    connection_attempts: int = 5
+    retry_delay: int = 10
+    timeout: int = 15
+
 
 settings = Settings()

@@ -1,8 +1,9 @@
 import os
 import logging
+import ecs_logging
+
 from logging.handlers import TimedRotatingFileHandler
 
-import ecs_logging
 from app.config import settings
 
 
