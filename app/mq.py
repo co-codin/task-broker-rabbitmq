@@ -105,7 +105,7 @@ class PikaChannel:
                     raise fut.exception()
 
                 delivery_tag, body = msg.result()
-                yield delivery_tag, body
+                yield body
 
                 await self.basic_ack(delivery_tag)
         except AMQPError as amqp_err:
