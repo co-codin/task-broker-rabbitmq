@@ -29,7 +29,7 @@ kubercreate-branch:
     - |
       [ -z "$(kubectl get --no-headers=true services -l=app=task-broker-nodeport -o name | awk -F "/" '{print $2}'t)" ] || kubectl delete service tb-service
 
-    - kubectl create -f ./deployment/02_deploy.yaml
+    - kubectl create -f ./deployment/deploy.yaml
     - kubectl expose deployment task-broker -l app=task-broker-nodeport --type=NodePort --name=tb-service
     - kubectl describe service tb-service
     - sleep 60

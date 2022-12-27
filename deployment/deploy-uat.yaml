@@ -58,4 +58,19 @@ spec:
           hostnames:
           - task-broker.lan                
 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: task-broker
+  labels:
+    app: task-broker-web   
+spec:
+  clusterIP: None
+  ports:
+   - name: http
+     protocol: TCP
+     port: 8000
+  selector:
+   app: task-broker-web
 
