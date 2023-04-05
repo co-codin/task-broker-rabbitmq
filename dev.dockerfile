@@ -1,10 +1,10 @@
 FROM python:3.8
 
-RUN pip install --no-cache-dir -U pip
+RUN pip3 install --no-cache-dir -U pip
 
 COPY requirements.txt /tmp/
 COPY requirements.dev.txt /tmp/
-RUN pip install -r /tmp/requirements.dev.txt
+RUN pip3 install -r /tmp/requirements.dev.txt
 
 WORKDIR /app
 CMD ["python", "-m", "app"]
