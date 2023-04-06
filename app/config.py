@@ -3,7 +3,6 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     port: int = 8000
-    reload: bool = True
 
     debug: bool = False
     log_dir: str = "/var/log/n3dwh/"
