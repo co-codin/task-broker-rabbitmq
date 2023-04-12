@@ -20,6 +20,16 @@ spec:
       labels:
         {{- include "task-broker.selectorLabels" . | nindent 8 }}
     spec:
+      initContainers:
+        - name: "{{ .Chart.Name }}-migrations"
+          image: "{{ printf "%s-migrations:%s" .Values.image.repository (.Values.image.tag | default .Chart.AppVersion) }}"
+          command: [ 'alembic', 'upgrade', 'head' ]
+          env:
+            - name: DWH_TASK_BROKER_DB_MIGRATION_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: { { include "task-broker.fullname" . } }-secret
+                  key: dwh_task_broker_db_migration_connection_string
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -29,6 +39,11 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
+          envFrom:
+            - secretRef:
+                name: { { include "task-broker.fullname" . } }-secret
+            - configMapRef:
+            name: { { include "task-broker.fullname" . } }-configmap
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
