@@ -4,6 +4,7 @@ import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.config import settings
@@ -32,7 +33,16 @@ async def get_task(guid: str, session:AsyncSession = Depends(db_session), user: 
         'status': item.status
     }
 
-
+@router.get("/health")
+def health() -> JSONResponse:
+    """
+    Health check endpoint
+    :return: JSONResponse
+    """
+    return JSONResponse(
+        status_code=200,
+        content={"message": "health check successful"},
+    )
 @router.post('/')
 async def send_query(create: CreateRequest,
                      session: AsyncSession = Depends(db_session),
