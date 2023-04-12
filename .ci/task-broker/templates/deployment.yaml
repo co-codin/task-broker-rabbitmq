@@ -28,7 +28,7 @@ spec:
             - name: DWH_TASK_BROKER_DB_MIGRATION_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
-                  name: { { include "task-broker.fullname" . } }-secret
+                  name: {{ include "task-broker.fullname" . }}-secret
                   key: dwh_task_broker_db_migration_connection_string
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -41,9 +41,9 @@ spec:
         - name: {{ .Chart.Name }}
           envFrom:
             - secretRef:
-                name: { { include "task-broker.fullname" . } }-secret
+                name: {{ include "task-broker.fullname" . }}-secret
             - configMapRef:
-            name: { { include "task-broker.fullname" . } }-configmap
+                name: {{ include "task-broker.fullname" . }}-configmap
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
