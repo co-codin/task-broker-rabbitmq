@@ -19,6 +19,11 @@ secrets:
 configmap:
   api_query_executor: "http://query-executor:8000/v1"
   api_iam: "http://iam-dev:8000"
+  exchange_compile: ""
+  query_compile: ""
+  query_compile_result: ""
+  exchange_execute: ""
+  query_execute_result: ""
 
 imagePullSecrets: []
 nameOverride: ""
