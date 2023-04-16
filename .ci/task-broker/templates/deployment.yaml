@@ -23,7 +23,6 @@ spec:
       initContainers:
         - name: "{{ .Chart.Name }}-migrations"
           image: "{{ printf "%s-migrations:%s" .Values.image.repository (.Values.image.tag | default .Chart.AppVersion) }}"
-          command: [ 'alembic', 'upgrade', 'head' ]
           env:
             - name: DWH_TASK_BROKER_DB_MIGRATION_CONNECTION_STRING
               valueFrom:
