@@ -56,7 +56,7 @@ build-migrations:
       --set-string configmap.query_compile_result="compile_results_$CI_ENVIRONMENT_NAME" 
       --set-string configmap.exchange_execute="query_execute_$CI_ENVIRONMENT_NAME" 
       --set-string configmap.query_execute_result="execute_results_$CI_ENVIRONMENT_NAME" 
-      --set-string podAnnotations.instrumentation.opentelemetry.io/inject-python=true
+      --set-string 'podAnnotations.instrumentation\.opentelemetry\.io/inject-python=true'
       $CI_PROJECT_NAME-$CI_ENVIRONMENT_NAME ./.ci/$CI_PROJECT_NAME -f .ci/$CI_PROJECT_NAME/updated-values.yaml
 
 
