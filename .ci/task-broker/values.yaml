@@ -10,6 +10,8 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+ciEnv: ""
+
 # all secrets must be b64 encoded
 secrets:
   db_connection_string: ""
