@@ -1,5 +1,3 @@
-from typing import Dict
-
 from fastapi import status
 
 
@@ -51,7 +49,7 @@ class DeserializeJSONQueryError(Exception):
 
 
 class DictKeyError(Exception):
-    def __init__(self, key: str, dict_: Dict):
+    def __init__(self, key: str, dict_: dict):
         self._key = key
         self._dict = dict_
 

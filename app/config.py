@@ -11,15 +11,16 @@ class Settings(BaseSettings):
     db_migration_connection_string: str = 'postgresql+psycopg2://postgres:dwh@db.lan:5432/broker'
     mq_connection_string: str = 'amqp://dwh:dwh@rabbit.lan:5672'
 
-    exchange_compile = 'query_compile'
-    query_compile = 'compile_tasks'
-    query_compile_result = 'compile_results'
+    exchange_compile: str = 'query_compile'
+    query_compile: str = 'compile_tasks'
+    query_compile_result: str = 'compile_results'
 
-    exchange_execute = 'query_execute'
-    query_execute_result = 'execute_results'
+    exchange_execute: str = 'query_execute'
+    query_execute_result: str = 'execute_results'
 
-    api_query_executor = 'http://query-executor.lan:8000/v1'
-    api_iam = 'http://iam.lan:8000'
+    api_query_executor: str = 'http://query-executor.lan:8000/v1'
+    api_iam: str = 'http://iam.lan:8000'
+    api_data_catalog: str = 'http://data-catalog.lan:8000'
 
     class Config:
         env_prefix = "dwh_task_broker_"
