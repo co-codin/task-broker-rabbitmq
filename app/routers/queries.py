@@ -15,6 +15,8 @@ router = APIRouter()
 
 
 class CreateRequest(BaseModel):
+    conn_string: str
+    run_guid: str
     query: dict
 
 
@@ -43,8 +45,10 @@ async def send_query(create: CreateRequest,
 
     await mq.basic_publish(settings.exchange_compile, 'task', json.dumps({
         'guid': query.guid,
+        'run_guid': create.run_guid,
         'query': query_json,
-        'identity_id': user['identity_id']
+        'identity_id': user['identity_id'],
+        'conn_string': create.conn_string
     }))
     LOG.info(f'Send query request {query.guid} sent to compiler')
 

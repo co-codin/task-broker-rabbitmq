@@ -130,9 +130,10 @@ async def consume(query, func):
         try:
             LOG.info(f'Starting {query} worker')
             async with create_channel() as channel:
-                async for body in channel.consume(query):
+                async for delivery_tag, body in channel.consume(query):
                     try:
                         await func(body)
+                        await channel.basic_ack(delivery_tag)
                     except Exception as e:
                         LOG.exception(f'Failed to process message {body}: {e}')
         except Exception as e:
