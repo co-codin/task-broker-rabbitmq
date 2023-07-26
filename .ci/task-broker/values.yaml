@@ -21,6 +21,7 @@ secrets:
 configmap:
   api_query_executor: "http://query-executor:8000/v1"
   api_iam: "http://iam-dev:8000"
+  api_data_catalog: "http://data-catalog-dev:8000"
   exchange_compile: ""
   query_compile: ""
   query_compile_result: ""
