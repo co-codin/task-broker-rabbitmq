@@ -63,6 +63,7 @@ deploy:
       --set image.repository=$DOCKER_REPO/$CI_PROJECT_NAME 
       --set-string configmap.api_query_executor="http://query-executor-$CI_ENVIRONMENT_NAME:8000/v1" 
       --set-string configmap.api_iam="http://iam-$CI_ENVIRONMENT_NAME:8000" 
+      --set-string configmap.api_data_catalog="http://data-catalog-$CI_ENVIRONMENT_NAME:8000" 
       --set-string configmap.exchange_compile="query_compile_$CI_ENVIRONMENT_NAME" 
       --set-string configmap.query_compile="compile_tasks_$CI_ENVIRONMENT_NAME" 
       --set-string configmap.query_compile_result="compile_results_$CI_ENVIRONMENT_NAME" 
