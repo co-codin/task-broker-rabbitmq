@@ -65,7 +65,7 @@ async def process_compile_update(body: str):
         run_guid = payload['run_guid']
         await send_for_execution(guid, conn_string, run_guid)
     else:
-        await send_failed_query(run_guid)
+        await send_failed_query(guid)
 
 async def send_failed_query(guid: str):
     async with httpx.AsyncClient() as requests:
