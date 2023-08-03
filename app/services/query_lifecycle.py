@@ -43,7 +43,6 @@ async def process_compile_update(body: str):
     status = payload['status']
     error = payload.get('error')
     query = payload.get('query')
-    conn_string = payload['conn_string']
     run_guid = payload['run_guid']
 
     LOG.info(f'Received compile update for {guid}, result is {status}: {query or error}')
