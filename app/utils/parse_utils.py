@@ -5,8 +5,7 @@ from app.errors import DeserializeJSONQueryError, DictKeyError
 
 def get_payload_value(payload: dict, key: str) -> str | dict:
     try:
-        if key != 'db_link':
-            value = payload[key]
+        value = payload[key]
     except KeyError as key_err:
         raise DictKeyError(key, payload) from key_err
     else:
