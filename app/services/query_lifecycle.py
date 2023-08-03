@@ -51,6 +51,7 @@ async def process_compile_update(body: str):
     status = {
         'compiled': QUERY_STATUS.COMPILED,
     }.get(status, QUERY_STATUS.ERROR_COMPILATION_ERROR)
+
     async with db_session() as session:
         await session.execute(
             update(Query)
@@ -61,8 +62,15 @@ async def process_compile_update(body: str):
                 error_description=error
             )
         )
+    if "conn_string" in payload:
+        conn_string = payload['conn_string']
+        await send_for_execution(guid, conn_string, run_guid)
+    else:
+        await send_failed_query(run_guid)
 
-    await send_for_execution(guid, conn_string, run_guid)
+async def send_failed_query(guid: str):
+    async with httpx.AsyncClient() as requests:
+            r = await requests.put(f'{settings.api_data_catalog}/queries/internal/mark-error/{guid}')
 
 
 async def send_for_execution(guid: str, conn_string: str, run_guid: str):
