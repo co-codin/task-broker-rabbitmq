@@ -40,7 +40,7 @@ async def send_query(create: CreateRequest,
                      session: AsyncSession = Depends(db_session),
                      mq=Depends(mq_channel),
                      user: dict = Depends(get_user)):
-    query_json = json.dumps(create.query)
+    query_json = json.dumps(create.query, ensure_ascii=False)
     query = await create_query(session, query_json, identity_id=user['identity_id'])
 
     await mq.basic_publish(settings.exchange_compile, 'task', json.dumps({
