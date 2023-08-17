@@ -43,6 +43,7 @@ async def process_compile_update(body: str):
     status = payload['status']
     error = payload.get('error')
     query = payload.get('query')
+    run_guid = payload['run_guid']
 
     LOG.info(f'Received compile update for {guid}, result is {status}: {query or error}')
 
@@ -60,16 +61,17 @@ async def process_compile_update(body: str):
                 error_description=error
             )
         )
-    if ("conn_string" in payload) and ("run_guid" in payload):
+
+    try:
         conn_string = payload['conn_string']
-        run_guid = payload['run_guid']
         await send_for_execution(guid, conn_string, run_guid)
-    else:
-        await send_failed_query(guid)
+    except KeyError:
+        await send_failed_query(run_guid)
+
 
 async def send_failed_query(guid: str):
     async with httpx.AsyncClient() as requests:
-            r = await requests.put(f'{settings.api_data_catalog}/queries/internal/mark-error/{guid}')
+        await requests.put(f'{settings.api_data_catalog}/queries/internal/mark-error/{guid}')
 
 
 async def send_for_execution(guid: str, conn_string: str, run_guid: str):
