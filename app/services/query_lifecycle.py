@@ -111,7 +111,7 @@ async def send_for_execution(guid: str, conn_string: str, run_guid: str):
             await session.execute(
                 update(Query)
                 .where(Query.guid == query.guid)
-                .values(compiled_query=query, status=QUERY_STATUS.ERROR_EXECUTION_ERROR.value)
+                .values(compiled_query=query.compiled_query, status=QUERY_STATUS.ERROR_EXECUTION_ERROR.value)
             )
 
     LOG.info(f'Task {query.guid} sent for db execution')
