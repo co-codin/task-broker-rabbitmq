@@ -62,6 +62,23 @@ async def process_compile_update(body: str):
             )
         )
 
+    if error:
+        async with db_session() as session:
+            query = await session.execute(select(Query).where(Query.guid == guid))
+            query = query.scalars().first()
+
+        async with httpx.AsyncClient() as requests:
+            r = await requests.post(f'{settings.api_query_executor}/queries/log-error', content=json.dumps({
+                'guid': guid,
+                'run_guid': run_guid,
+                'query': query,
+                'db': 'raw',
+                'identity_id': query.identity_id,
+                'conn_string': payload['conn_string'],
+                'error_description': error,
+            }))
+           
+
     try:
         conn_string = payload['conn_string']
         await send_for_execution(guid, conn_string, run_guid)
