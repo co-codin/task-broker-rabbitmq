@@ -77,7 +77,6 @@ async def process_compile_update(body: str):
                 'conn_string': payload['conn_string'],
                 'error_description': error,
             }))
-           
 
     try:
         conn_string = payload['conn_string']

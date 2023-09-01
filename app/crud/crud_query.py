@@ -48,8 +48,9 @@ async def select_task(session: AsyncSession, guid: str) -> Query:
     return item
 
 
-async def create_query(session: AsyncSession, query_json: str, identity_id: str) -> Query:
+async def create_query(session: AsyncSession, query_json: str, identity_id: str, run_guid: str) -> Query:
     query = Query(
+        guid=run_guid,
         query=query_json,
         identity_id=identity_id
     )
